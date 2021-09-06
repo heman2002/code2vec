@@ -136,7 +136,7 @@ class Code2VecModel(Code2VecModelBase):
                 return None  # FIXME: why do we return none here?
 
         with open('log.txt', 'w') as log_output_file:
-            if self.config.EXPORT_CODE_VECTORS or self.config.GET_PREDICTION_VECTOR:
+            if self.config.EXPORT_CODE_VECTORS or self.config.PREDICTION_FOLDER is not None:
                 code_vectors_file = open(self.config.TEST_DATA_PATH + '.vectors', 'w')
             total_predictions = 0
             total_prediction_batches = 0
@@ -173,7 +173,7 @@ class Code2VecModel(Code2VecModelBase):
 
                     total_predictions += len(original_names)
                     total_prediction_batches += 1
-                    if self.config.EXPORT_CODE_VECTORS or self.config.GET_PREDICTION_VECTOR:
+                    if self.config.EXPORT_CODE_VECTORS or self.config.PREDICTION_FOLDER is not None:
                         self._write_code_vectors(code_vectors_file, code_vectors)
                     if total_prediction_batches % self.config.NUM_BATCHES_TO_LOG_PROGRESS == 0:
                         elapsed = time.time() - start_time
@@ -183,7 +183,7 @@ class Code2VecModel(Code2VecModelBase):
                 pass  # reader iterator is exhausted and have no more batches to produce.
             self.log('Done evaluating, epoch reached')
             log_output_file.write(str(topk_accuracy_evaluation_metric.topk_correct_predictions) + '\n')
-        if self.config.EXPORT_CODE_VECTORS or self.config.GET_PREDICTION_VECTOR:
+        if self.config.EXPORT_CODE_VECTORS or self.config.PREDICTION_FOLDER is not None:
             code_vectors_file.close()
         
         elapsed = int(time.time() - eval_start_time)
@@ -363,7 +363,7 @@ class Code2VecModel(Code2VecModelBase):
                 topk_predicted_words=top_words,
                 topk_predicted_words_scores=top_scores,
                 attention_per_context=attention_per_context,
-                code_vector=(code_vectors if self.config.EXPORT_CODE_VECTORS or self.config.GET_PREDICTION_VECTOR else None)
+                code_vector=(code_vectors if self.config.EXPORT_CODE_VECTORS or self.config.PREDICTION_FOLDER is not None else None)
             ))
         return prediction_results
 

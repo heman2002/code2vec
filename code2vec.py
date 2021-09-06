@@ -1,8 +1,10 @@
+from logging import NOTSET
 from vocabularies import VocabType
 from config import Config
 from interactive_predict import InteractivePredictor
 from model_base import Code2VecModelBase
-
+import os
+import numpy as np
 
 def load_model_dynamically(config: Config) -> Code2VecModelBase:
     assert config.DL_FRAMEWORK in {'tensorflow', 'keras'}
@@ -32,11 +34,26 @@ if __name__ == '__main__':
         if eval_results is not None:
             config.log(
                 str(eval_results).replace('topk', 'top{}'.format(config.TOP_K_WORDS_CONSIDERED_DURING_PREDICTION)))
-    if config.PREDICT and config.GET_PREDICTION_VECTOR:
+    if config.PREDICT:
         predictor = InteractivePredictor(config, model)
-        npa =  predictor.predict()
-        print(npa)
-    elif config.PREDICT:
+        predictor.predict()
+    if config.PREDICTION_FOLDER is not None:
         predictor = InteractivePredictor(config, model)
-        npa =  predictor.predict()
+        directory = os.fsencode(config.PREDICTION_FOLDER)
+        x, y = [], []
+        for file in os.listdir(directory):
+            filename = os.fsdecode(file)
+            if filename=='predicted_vector.npy' or filename=='predicted_target.npy':
+                continue
+
+            x.append(predictor.predictAndSave(filename))
+            y.append(filename)
+
+        npx = np.array(x)
+        npy = np.array(y)
+        print(npx)
+        print(npy)
+        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_vector.npy'), npx)
+        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_target.npy'), npy)    
+            
     model.close_session()
