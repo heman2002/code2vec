@@ -32,7 +32,11 @@ if __name__ == '__main__':
         if eval_results is not None:
             config.log(
                 str(eval_results).replace('topk', 'top{}'.format(config.TOP_K_WORDS_CONSIDERED_DURING_PREDICTION)))
-    if config.PREDICT:
+    if config.PREDICT and config.GET_PREDICTION_VECTOR:
         predictor = InteractivePredictor(config, model)
-        predictor.predict()
+        npa =  predictor.predict()
+        print(npa)
+    elif config.PREDICT:
+        predictor = InteractivePredictor(config, model)
+        npa =  predictor.predict()
     model.close_session()
