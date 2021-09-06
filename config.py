@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Optional
+from typing import List, Optional
 import logging
 from argparse import ArgumentParser
 import sys
@@ -41,8 +41,8 @@ class Config:
                             help="path to store logs into. if not given logs are not saved to file.")
         parser.add_argument('-tb', '--tensorboard', dest='use_tensorboard', action='store_true',
                             help='use tensorboard during training')
-        parser.add_argument('--get_prediction_vector', action='store_true', required=False,
-                            help="get predicted code vectors as numpy array for the given examples")                    
+        parser.add_argument("-f2p", dest="prediction_folder",
+                            help="path to folder which contains the files for code2vec prediction", metavar="FILE", required=False, default='')                                        
         return parser
 
     def set_defaults(self):
@@ -87,7 +87,7 @@ class Config:
         self.LOGS_PATH = args.logs_path
         self.DL_FRAMEWORK = 'tensorflow' if not args.dl_framework else args.dl_framework
         self.USE_TENSORBOARD = args.use_tensorboard
-        self.GET_PREDICTION_VECTOR = args.get_prediction_vector
+        self.PREDICTION_FOLDER = args.prediction_folder
 
     def __init__(self, set_defaults: bool = False, load_from_args: bool = False, verify: bool = False):
         self.NUM_TRAIN_EPOCHS: int = 0
@@ -129,7 +129,7 @@ class Config:
         self.LOGS_PATH: Optional[str] = None
         self.DL_FRAMEWORK: str = ''  # in {'keras', 'tensorflow'}
         self.USE_TENSORBOARD: bool = False
-        self.GET_PREDICTION_VECTOR: bool = False
+        self.PREDICTION_FOLDER: Optional[str] = None
 
         # Automatically filled by `Code2VecModelBase._init_num_of_examples()`.
         self.NUM_TRAIN_EXAMPLES: int = 0

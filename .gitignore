@@ -1,6 +1,7 @@
 *.class
 *.lst
 **/models/**
+input/
 **/data/**
 **/.idea/**
 *.tar.gz
