@@ -66,5 +66,5 @@ class InteractivePredictor:
             return
         raw_prediction_results = self.model.predict(predict_lines)
         for raw_prediction in raw_prediction_results:
-            return np.array(raw_prediction.code_vector)
+            return raw_prediction.code_vector
    
