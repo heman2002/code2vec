@@ -40,20 +40,22 @@ if __name__ == '__main__':
     if config.PREDICTION_FOLDER is not None:
         predictor = InteractivePredictor(config, model)
         directory = os.fsencode(config.PREDICTION_FOLDER)
-        x, y = [], []
+        x, y = None, None
         for file in os.listdir(directory):
             filename = os.fsdecode(file)
             if filename=='predicted_vector.npy' or filename=='predicted_target.npy':
                 continue
+            temp = predictor.predictAndSave(os.path.join(config.PREDICTION_FOLDER, filename))
+            if x is None:
+                x = np.reshape(temp,(1, temp.shape[0]))
+                y = np.array(filename)
+            else:        
+                x = np.vstack((x, temp))
+                y = np.vstack((y, filename))
 
-            x.append(predictor.predictAndSave(filename))
-            y.append(filename)
-
-        npx = np.array(x)
-        npy = np.array(y)
-        print(npx)
-        print(npy)
-        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_vector.npy'), npx)
-        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_target.npy'), npy)    
+        print(x)
+        print(y)
+        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_vector.npy'), x)
+        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_target.npy'), y)    
             
     model.close_session()
