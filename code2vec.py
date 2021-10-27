@@ -46,6 +46,8 @@ if __name__ == '__main__':
             if filename=='predicted_vector.npy' or filename=='predicted_target.npy':
                 continue
             temp = predictor.predictAndSave(os.path.join(config.PREDICTION_FOLDER, filename))
+            if temp is None:
+                continue
             if x is None:
                 x = np.reshape(temp,(1, temp.shape[0]))
                 y = np.array(filename)
