@@ -1,10 +1,18 @@
 from logging import NOTSET
+
+from numpy.lib.histograms import _histogram_bin_edges_dispatcher
 from vocabularies import VocabType
 from config import Config
 from interactive_predict import InteractivePredictor
 from model_base import Code2VecModelBase
 import os
 import numpy as np
+from extractor import Extractor
+
+SHOW_TOP_CONTEXTS = 10
+MAX_PATH_LENGTH = 8
+MAX_PATH_WIDTH = 2
+JAR_PATH = 'JavaExtractor/JPredict/target/JavaExtractor-0.0.1-SNAPSHOT.jar'
 
 def load_model_dynamically(config: Config) -> Code2VecModelBase:
     assert config.DL_FRAMEWORK in {'tensorflow', 'keras'}
@@ -58,6 +66,17 @@ if __name__ == '__main__':
         print(x)
         print(y)
         np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_vector.npy'), x)
-        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_target.npy'), y)    
+        np.save(os.path.join(config.PREDICTION_FOLDER, 'predicted_target.npy'), y)
+    if config.JavaExtractor is not None:
+        print(config.JavaExtractor)
+        path_extractor = Extractor(config, jar_path=JAR_PATH, max_path_length=MAX_PATH_LENGTH, max_path_width=MAX_PATH_WIDTH)
+        try:
+            predict_lines, hash_to_string_dict = path_extractor.extract_paths(config.JavaExtractor)
+            print('predict_lines')
+            print(predict_lines)
+            print('hash_to_string_dict')
+            print(hash_to_string_dict)
+        except ValueError as e:
+            print(e)      
             
     model.close_session()
